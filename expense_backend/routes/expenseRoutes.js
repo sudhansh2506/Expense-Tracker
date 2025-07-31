@@ -14,10 +14,20 @@ router.post('/', async (req, res) => {
   }
 });
 
-// Get all expenses
+// ✅ Get all expenses OR filter by date range
 router.get('/', async (req, res) => {
   try {
-    const expenses = await Expense.find();
+    const { from, to } = req.query;
+
+    let filter = {};
+    if (from && to) {
+      filter.date = {
+        $gte: new Date(from),
+        $lte: new Date(to),
+      };
+    }
+
+    const expenses = await Expense.find(filter).sort({ date: -1 });
     res.json(expenses);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -55,8 +65,5 @@ router.delete('/', async (req, res) => {
     res.status(500).json({ message: 'Error deleting all expenses', error });
   }
 });
-
-
-
 
 export default router;
