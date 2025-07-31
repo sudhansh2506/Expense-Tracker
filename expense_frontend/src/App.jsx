@@ -7,13 +7,14 @@ function App() {
   const [title, setTitle] = useState('');
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState('');
-const [selectedCategory, setSelectedCategory] = useState('All');
+  const [date, setDate] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
+  const total = expenses.reduce((sum, exp) => sum + Number(exp.amount), 0);
 
- const [searchTerm, setSearchTerm] = useState('');
-
-  const total=expenses.reduce((sum,exp)=>sum+Number(exp.amount),0);
-  // Fetch all expenses on page load
   useEffect(() => {
     fetchExpenses();
   }, []);
@@ -26,67 +27,65 @@ const [selectedCategory, setSelectedCategory] = useState('All');
       console.error('Error fetching expenses:', error);
     }
   };
-   
+
   const handleDelete = async (id) => {
-  try {
-    await axios.delete(`http://localhost:8000/api/expenses/${id}`);
-    fetchExpenses(); // Refresh the list after deleting
-  } catch (error) {
-    console.error('Error deleting expense:', error);
-  }
-};
+    try {
+      await axios.delete(`http://localhost:8000/api/expenses/${id}`);
+      fetchExpenses();
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+    }
+  };
 
-
-
-const handleClearAll = async () => {
-  if (!window.confirm("Are you sure you want to delete all expenses?")) return;
-  try {
-    await axios.delete('http://localhost:8000/api/expenses');
-    fetchExpenses();
-  } catch (error) {
-    console.error('Error clearing all expenses:', error);
-  }
-};
-
-
-
-
-
+  const handleClearAll = async () => {
+    if (!window.confirm("Are you sure you want to delete all expenses?")) return;
+    try {
+      await axios.delete('http://localhost:8000/api/expenses');
+      fetchExpenses();
+    } catch (error) {
+      console.error('Error clearing all expenses:', error);
+    }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); // prevent form from refreshing the page
+    e.preventDefault();
     try {
       const newExpense = {
         title,
         amount,
-        category
+        category,
+        date,
       };
 
       await axios.post('http://localhost:8000/api/expenses', newExpense);
 
-      // Clear form
       setTitle('');
       setAmount('');
       setCategory('');
+      setDate('');
 
-      // Refresh the list
       fetchExpenses();
     } catch (error) {
       console.error('Error adding expense:', error);
     }
   };
 
-                         
-const filteredExpenses = expenses
-  .filter(exp => {
-    return selectedCategory === 'All' || exp.category === selectedCategory;
-  })
-  .filter(exp => {
-    return exp.title.toLowerCase().includes(searchTerm.toLowerCase());
-  });
+  const handleDateFilter = async () => {
+    if (!fromDate || !toDate) {
+      alert("Please select both From and To dates.");
+      return;
+    }
+    try {
+      const res = await axios.get(`http://localhost:8000/api/expenses?from=${fromDate}&to=${toDate}`);
+      setExpenses(res.data);
+    } catch (error) {
+      console.error("Error filtering by date:", error);
+    }
+  };
 
-
-
+  const filteredExpenses = expenses
+    .filter((exp) => selectedCategory === 'All' || exp.category === selectedCategory)
+    .filter((exp) => exp.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div className="container">
@@ -113,52 +112,66 @@ const filteredExpenses = expenses
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         />
+        <input
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          required
+        />
         <button type="submit">Add Expense</button>
       </form>
-   <h2>total:{total}</h2>
 
+      <h2>Total: ₹{total}</h2>
 
-   <input
-  type="text"
-  placeholder="Search by title"
-  value={searchTerm}
-  onChange={(e) => setSearchTerm(e.target.value)}
-/>
+      <input
+        type="text"
+        placeholder="Search by title"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+      />
 
+      <label>Filter by Category: </label>
+      <select
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+      >
+        <option value="All">All</option>
+        <option value="Food">Food</option>
+        <option value="Travel">Travel</option>
+        <option value="Rent">Rent</option>
+        <option value="Utilities">Utilities</option>
+      </select>
 
+      {/* ✅ New From-To Date Filter */}
+      <div style={{ marginTop: '20px' }}>
+        <label>From: </label>
+        <input
+          type="date"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+        />
+        <label>To: </label>
+        <input
+          type="date"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+        />
+        <button onClick={handleDateFilter}>📅 Filter by Date</button>
+      </div>
 
-
-
- <label>Filter by Category: </label>
-<select
-  value={selectedCategory}
-  onChange={(e) => setSelectedCategory(e.target.value)}
->
-  <option value="All">All</option>
-  <option value="Food">Food</option>
-  <option value="Travel">Travel</option>
-  <option value="Rent">Rent</option>
-  <option value="Utilities">Utilities</option>
-</select>
-
-
-
-<button onClick={handleClearAll}>
-  🧹 Clear All Expenses
-</button>
-
-
-
+      <button onClick={handleClearAll}>
+        🧹 Clear All Expenses
+      </button>
 
       <ul>
-  {filteredExpenses.map((exp) => (
-    <li key={exp._id}>
-      <strong>{exp.title}</strong> - ₹{exp.amount} ({exp.category})
-      <button onClick={() => handleDelete(exp._id)}>❌ Delete</button>
-    </li>
-  ))}
-</ul>
-
+        {filteredExpenses.map((exp) => (
+          <li key={exp._id}>
+            <strong>{exp.title}</strong> - ₹{exp.amount} ({exp.category}) <br />
+            <small>{new Date(exp.date).toLocaleDateString()}</small>
+            <button onClick={() => handleDelete(exp._id)}>❌ Delete</button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

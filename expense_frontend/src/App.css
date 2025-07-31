@@ -1,95 +1,156 @@
+/* Global styles */
 body {
-  font-family: Arial, sans-serif;
-  background-color: #f0f2f5;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #c3aed6, #f5d5e0, #d5f4e6);
+  background-size: 300% 300%;
+  animation: gradientShift 15s ease infinite;
   margin: 0;
   padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
 }
 
-
+/* Card-style container */
 .container {
-  max-width: 600px;
-  margin: 40px auto;
-  padding: 30px;
-  background-color: white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  border-radius: 12px;
+  width: 100%;
+  max-width: 700px;
+  margin-top: 50px;
+  padding: 40px 30px;
+  background-color: #ffffffee;
+  border-radius: 20px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.5s ease-in-out;
 }
 
-h1 {
-  color:black;
+/* Headings */
+h1,
+h2 {
   text-align: center;
+  color: #5e35b1;
   margin-bottom: 20px;
 }
 
-h2 {
-  color:black;
-  text-align: center;
-  margin-bottom: 10px;
-}
-
-
+/* Form styling */
 form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-
-
-input, select {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-
-button {
-  padding: 10px;
-  font-size: 16px;
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-
-
-button:hover {
-  background-color: #45a049;
-}
-
-ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-
-
-li {
-  background-color:blue;
-  padding: 10px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  display: flex;
-  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 30px;
   align-items: center;
 }
 
+input,
+select {
+  width: 90%;
+  padding: 12px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 10px;
+  transition: border-color 0.3s ease;
+}
+
+input:focus,
+select:focus {
+  border-color: #7e57c2;
+  outline: none;
+}
+
+/* Buttons */
+button {
+  padding: 12px 20px;
+  font-size: 16px;
+  background-color: #7e57c2;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #5e35b1;
+  transform: scale(1.03);
+}
+
+/* Expense list */
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  background-color: #f3e5f5;
+  padding: 14px 18px;
+  margin-bottom: 14px;
+  border-left: 6px solid #7e57c2;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  color: #333;
+}
+
+li strong {
+  font-size: 18px;
+  color: #4a148c;
+}
+
+li small {
+  font-size: 14px;
+  color: #666;
+}
 
 li button {
-  background-color: #e53935;
+  align-self: flex-start;
+  margin-top: 8px;
+  background-color: #ef5350;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 li button:hover {
   background-color: #d32f2f;
 }
 
+/* Filter date controls */
 .filter-controls {
   display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
   flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 25px;
+  justify-content: center;
+}
+
+/* Placeholder styling */
+input[type="text"]::placeholder,
+input[type="number"]::placeholder {
+  color: #aaa;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
 }
